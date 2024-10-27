@@ -88,3 +88,30 @@ func (ctrl *PlatformController) DeletePlatform(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Platform deleted successfully"})
 }
+
+func (ctrl *PlatformController) UpdatePlatform(c *gin.Context) {
+	var platform models.Platform
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid platform ID"})
+		return
+	}
+
+	if err := ctrl.dbConn.First(&platform, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Platform not found"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&platform); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := ctrl.dbConn.Save(&platform).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update platform"})
+		return
+	}
+
+	c.JSON(http.StatusOK, platform)
+}
