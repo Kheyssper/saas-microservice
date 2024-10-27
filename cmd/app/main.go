@@ -6,9 +6,16 @@ import (
 	"saasmicroservice/pkg/db"
 	"saasmicroservice/pkg/router"
 	"saasmicroservice/pkg/server"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Carregar as variáveis de ambiente do arquivo .env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 	// Conectar ao banco de dados
 	dbConn, err := db.NewPostgresDB()
 	if err != nil {
