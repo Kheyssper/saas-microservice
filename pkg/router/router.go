@@ -11,14 +11,15 @@ import (
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
-	r.Use(middleware.Authenticate(db)) // Middleware de autenticação
+	r.Use(middleware.Authenticate(db))
 
 	platformCtrl := controllers.NewPlatformController(db)
 
 	r.POST("/platforms", platformCtrl.CreatePlatform)
 	r.GET("/platforms", platformCtrl.ListPlatforms)
-	r.POST("/platforms/:platform_id/run", platformCtrl.RunPlatform)   // Inicia a plataforma
-	r.POST("/platforms/:platform_id/stop", platformCtrl.StopPlatform) // Para a plataforma
-	r.DELETE("/platforms/:platform_id", platformCtrl.DeletePlatform)  // Exclui a plataforma
+	r.POST("/platforms/:platform_id/run", platformCtrl.RunPlatform)
+	r.POST("/platforms/:platform_id/stop", platformCtrl.StopPlatform)
+	r.DELETE("/platforms/:platform_id", platformCtrl.DeletePlatform)
+	r.PUT("/platforms/:platform_id", platformCtrl.UpdatePlatform)
 	return r
 }
