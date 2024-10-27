@@ -42,48 +42,49 @@ func (ctrl *PlatformController) ListPlatforms(c *gin.Context) {
 	c.JSON(http.StatusOK, platforms)
 }
 
-func RunPlatform(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		platformID, _ := strconv.Atoi(c.Param("platform_id"))
-		var platform models.Platform
+func (ctrl *PlatformController) RunPlatform(c *gin.Context) {
+	platformID, _ := strconv.Atoi(c.Param("platform_id"))
+	var platform models.Platform
 
-		if err := db.First(&platform, platformID).Error; err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Platform not found"})
-			return
-		}
-
-		platform.Status = "running"
-		db.Save(&platform)
-
-		c.JSON(http.StatusOK, gin.H{"message": "Platform started successfully"})
+	if err := ctrl.dbConn.First(&platform, platformID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Platform not found"})
+		return
 	}
+
+	platform.Status = "running"
+	if err := ctrl.dbConn.Save(&platform).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to start platform"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Platform started successfully"})
 }
 
-func StopPlatform(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		platformID, _ := strconv.Atoi(c.Param("platform_id"))
-		var platform models.Platform
+func (ctrl *PlatformController) StopPlatform(c *gin.Context) {
+	platformID, _ := strconv.Atoi(c.Param("platform_id"))
+	var platform models.Platform
 
-		if err := db.First(&platform, platformID).Error; err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Platform not found"})
-			return
-		}
-
-		platform.Status = "stopped"
-		db.Save(&platform)
-
-		c.JSON(http.StatusOK, gin.H{"message": "Platform stopped successfully"})
+	if err := ctrl.dbConn.First(&platform, platformID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Platform not found"})
+		return
 	}
+
+	platform.Status = "stopped"
+	if err := ctrl.dbConn.Save(&platform).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to stop platform"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Platform stopped successfully"})
 }
 
-func DeletePlatform(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		platformID, _ := strconv.Atoi(c.Param("platform_id"))
-		if err := db.Delete(&models.Platform{}, platformID).Error; err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Platform not found"})
-			return
-		}
+func (ctrl *PlatformController) DeletePlatform(c *gin.Context) {
+	platformID, _ := strconv.Atoi(c.Param("platform_id"))
 
-		c.JSON(http.StatusOK, gin.H{"message": "Platform deleted successfully"})
+	if err := ctrl.dbConn.Delete(&models.Platform{}, platformID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete platform"})
+		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Platform deleted successfully"})
 }

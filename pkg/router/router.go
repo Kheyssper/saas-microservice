@@ -17,7 +17,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	r.POST("/platforms", platformCtrl.CreatePlatform)
 	r.GET("/platforms", platformCtrl.ListPlatforms)
-	// Outras rotas como Run/Stop Platforms, Delete etc.
-
+	r.POST("/platforms/:platform_id/run", platformCtrl.RunPlatform)   // Inicia a plataforma
+	r.POST("/platforms/:platform_id/stop", platformCtrl.StopPlatform) // Para a plataforma
+	r.DELETE("/platforms/:platform_id", platformCtrl.DeletePlatform)  // Exclui a plataforma
 	return r
 }
