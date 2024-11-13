@@ -1,0 +1,9 @@
+
+## Run SAAS microservice (Still a generic)
+
+
+```
+docker build -t saas-microservice .
+docker run -p 8001:8001 -d saas-microservice
+```
+
